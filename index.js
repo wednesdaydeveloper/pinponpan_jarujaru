@@ -17,6 +17,8 @@ const client = new line.Client(config);
 const app = express();
 
 var count = 0;
+const map = new Map();
+
 // register a webhook handler with middleware
 // about the middleware, please refer to doc
 app.post('/callback', line.middleware(config), (req, res) => {
@@ -30,20 +32,6 @@ app.post('/callback', line.middleware(config), (req, res) => {
     });
 });
 
-// event handler
-function handleEvent(event) {
-  if (event.type !== 'message' || event.message.type !== 'text') {
-    // ignore non-text-message event
-    return Promise.resolve(null);
-  }
-
-  // create a echoing text message
-  const echo = { type: 'text', text: event.message.text + 'ですのよ' };
-
-  // use reply API
-  return client.replyMessage(event.replyToken, echo);
-}
-
 function handlePinponpan(event) {
   if (event.type !== 'message' || event.message.type !== 'text') {
     // ignore non-text-message event
@@ -56,12 +44,14 @@ function handlePinponpan(event) {
   } else if (event.message.text == "ピンポンパン") {
     text = "１個少ないわ！";
   } else if (event.message.text == "ピン") {
+    let count = map.get(event.source.userId) || 0;
     if (++count < 5) {
       text = "背筋伸びてるやん！";
     } else {
       text = "背筋伸びきってるやん！";
       count = 0;
     }
+    map.set(event.source.userId, count);
   } else if (event.message.text == "ピンポーン") {
     text = "誰か来ましたよ！";
   } else if (event.message.text == "ポンピーン") {
