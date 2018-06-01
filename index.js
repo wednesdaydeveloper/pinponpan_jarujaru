@@ -16,7 +16,6 @@ const client = new line.Client(config);
 // about Express itself: https://expressjs.com/
 const app = express();
 
-var count = 0;
 const map = new Map();
 
 // register a webhook handler with middleware
